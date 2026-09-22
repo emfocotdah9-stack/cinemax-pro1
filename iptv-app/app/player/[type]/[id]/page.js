@@ -123,7 +123,7 @@ export default function PlayerPage({ params }) {
       const video = videoRef.current;
       if (!video) return;
 
-      if (window.Hls && window.Hls.isSupported() && targetUrl.endsWith('.m3u8')) {
+      if (window.Hls && window.Hls.isSupported() && type === 'live') {
         hls = new window.Hls();
         hls.loadSource(targetUrl);
         hls.attachMedia(video);
@@ -135,7 +135,7 @@ export default function PlayerPage({ params }) {
             setError('Erro ao carregar o stream. Tente novamente mais tarde.');
           }
         });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      } else if (type === 'live' && video.canPlayType('application/vnd.apple.mpegurl')) {
         // Native HLS support (Safari)
         video.src = targetUrl;
         video.addEventListener('loadedmetadata', () => {

@@ -26,20 +26,44 @@ export async function GET(request, { params }) {
   const streamUrl = `${baseUrl}/${type}/${username}/${password}/${streamId}.${ext}`;
 
   try {
-    const response = await fetch(streamUrl);
+    const fetchOptions = {
+      headers: {}
+    };
 
-    if (!response.ok) {
+    // Forward the Range header if it exists (Crucial for Safari/iOS MP4 streaming)
+    const range = request.headers.get('range');
+    if (range) {
+      fetchOptions.headers['Range'] = range;
+    }
+
+    const response = await fetch(streamUrl, fetchOptions);
+
+    if (!response.ok && response.status !== 206) {
       throw new Error(`Stream fetch failed: ${response.status}`);
     }
 
     const contentType = response.headers.get('content-type') || 'video/mp4';
     
+    // Prepare response headers
+    const responseHeaders = {
+      'Content-Type': contentType,
+      'Cache-Control': 'no-cache',
+    };
+
+    // Forward necessary headers for streaming
+    const contentLength = response.headers.get('content-length');
+    if (contentLength) responseHeaders['Content-Length'] = contentLength;
+    
+    const contentRange = response.headers.get('content-range');
+    if (contentRange) responseHeaders['Content-Range'] = contentRange;
+
+    const acceptRanges = response.headers.get('accept-ranges');
+    if (acceptRanges) responseHeaders['Accept-Ranges'] = acceptRanges;
+    
     // Stream the response body through
     return new Response(response.body, {
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'no-cache',
-      }
+      status: response.status,
+      headers: responseHeaders
     });
   } catch (error) {
     console.error('Stream proxy error:', error);
