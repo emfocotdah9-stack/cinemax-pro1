@@ -1,0 +1,43 @@
+import React, { useRef } from 'react';
+import styles from './Carousel.module.css';
+
+import Link from 'next/link';
+
+export default function Carousel({ title, items, onFocusItem, type = 'movie' }) {
+  const scrollRef = useRef(null);
+
+  if (!items || items.length === 0) return null;
+
+  return (
+    <div className={styles.carouselContainer}>
+      <h2 className={styles.carouselTitle}>{title}</h2>
+      
+      <div className={styles.scrollArea} ref={scrollRef}>
+        <div className={styles.rail}>
+          {items.map((item, idx) => {
+            const id = item.stream_id || item.series_id;
+            const itemType = item.stream_type === 'live' ? 'live' : (item.series_id ? 'series' : 'movie');
+            
+            return (
+              <Link href={`/player/${itemType}/${id}`} key={id || idx}>
+                <div 
+                  className={styles.card}
+                  tabIndex={0}
+                  onFocus={() => onFocusItem && onFocusItem(item)}
+                >
+                  <div 
+                    className={styles.cardImage} 
+                    style={{ backgroundImage: `url(${item.stream_icon || item.cover || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
+                  ></div>
+                  <div className={styles.cardInfo}>
+                    <h3 className={styles.cardTitle}>{item.name}</h3>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,93 @@
+.carouselContainer {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding-left: 4rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.carouselTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+  opacity: 0.9;
+}
+
+.scrollArea {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none; /* Firefox */
+  padding-bottom: 2rem;
+  padding-top: 1rem;
+  margin-top: -1rem;
+}
+
+.scrollArea::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.rail {
+  display: flex;
+  gap: 1.5rem;
+  padding-right: 4rem;
+}
+
+.card {
+  flex: 0 0 auto;
+  width: 220px;
+  height: 330px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background-color: var(--surface-color);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.3s ease;
+}
+
+.cardInfo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem 1rem 1rem;
+  background: linear-gradient(to top, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0.7) 60%, transparent 100%);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+
+/* Hover and Focus effects for Smart TV feel */
+.card:hover, .card:focus {
+  transform: scale(1.08) translateY(-10px);
+  z-index: 10;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+  outline: 3px solid var(--text-main);
+  outline-offset: 4px;
+}
+
+.card:hover .cardImage, .card:focus .cardImage {
+  transform: scale(1.05);
+}
+
+.card:hover .cardInfo, .card:focus .cardInfo {
+  transform: translateY(0);
+}
