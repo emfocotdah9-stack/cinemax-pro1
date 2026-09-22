@@ -77,7 +77,7 @@ export default function AppHome() {
     
     const fetchCategories = async () => {
       setCategories([]);
-      setSelectedCategory(null);
+      setSelectedCategory('all');
       setCategoryItems([]);
       
       let action = '';
@@ -89,7 +89,11 @@ export default function AppHome() {
         const res = await fetch(`/api/xtream?action=${action}`);
         const data = await res.json();
         if (Array.isArray(data)) {
-          setCategories([{ category_id: 'favorites', category_name: '⭐ Favoritos' }, ...data]);
+          setCategories([
+            { category_id: 'all', category_name: 'Todos' },
+            { category_id: 'favorites', category_name: '⭐ Favoritos' },
+            ...data
+          ]);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -119,10 +123,18 @@ export default function AppHome() {
       if (activeTab === 'live') action = 'get_live_streams';
       
       try {
-        const res = await fetch(`/api/xtream?action=${action}&category_id=${selectedCategory}`);
+        const url = selectedCategory === 'all' 
+          ? `/api/xtream?action=${action}`
+          : `/api/xtream?action=${action}&category_id=${selectedCategory}`;
+          
+        const res = await fetch(url);
         const data = await res.json();
         if (Array.isArray(data)) {
-          setCategoryItems(data);
+          if (selectedCategory === 'all') {
+            setCategoryItems(data.slice(0, 1500)); // Limite de segurança para não travar o navegador
+          } else {
+            setCategoryItems(data);
+          }
         }
       } catch (error) {
         console.error("Error fetching category items:", error);
@@ -195,20 +207,25 @@ export default function AppHome() {
         </div>
         <ul className={styles.navItems}>
           <li className={activeTab === 'home' ? styles.active : ''} onClick={() => setActiveTab('home')} tabIndex={0} title="Início">
-            <span>🏠 {!isSidebarCollapsed && 'Início'}</span>
+            <span className={styles.navIcon}>🏠</span>
+            <span className={styles.navText}>{!isSidebarCollapsed && 'Início'}</span>
           </li>
           <li className={activeTab === 'movies' ? styles.active : ''} onClick={() => setActiveTab('movies')} tabIndex={0} title="Filmes">
-            <span>🎬 {!isSidebarCollapsed && 'Filmes'}</span>
+            <span className={styles.navIcon}>🎬</span>
+            <span className={styles.navText}>{!isSidebarCollapsed && 'Filmes'}</span>
           </li>
           <li className={activeTab === 'series' ? styles.active : ''} onClick={() => setActiveTab('series')} tabIndex={0} title="Séries">
-            <span>📺 {!isSidebarCollapsed && 'Séries'}</span>
+            <span className={styles.navIcon}>📺</span>
+            <span className={styles.navText}>{!isSidebarCollapsed && 'Séries'}</span>
           </li>
           <li className={activeTab === 'live' ? styles.active : ''} onClick={() => setActiveTab('live')} tabIndex={0} title="TV Ao Vivo">
-            <span>📡 {!isSidebarCollapsed && 'TV Ao Vivo'}</span>
+            <span className={styles.navIcon}>📡</span>
+            <span className={styles.navText}>{!isSidebarCollapsed && 'TV Ao Vivo'}</span>
           </li>
         </ul>
         <div className={styles.settings} title="Configurações">
-          <span>⚙️ {!isSidebarCollapsed && 'Configurações'}</span>
+          <span className={styles.navIcon}>⚙️</span>
+          <span className={styles.navText}>{!isSidebarCollapsed && 'Configurações'}</span>
         </div>
       </nav>
 

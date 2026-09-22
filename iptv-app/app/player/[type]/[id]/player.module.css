@@ -115,3 +115,31 @@
   font-weight: 400;
   opacity: 0.9;
 }
+
+/* =========================================
+   RESPONSIVENESS (Mobile & Tablet)
+   ========================================= */
+@media (max-width: 768px) {
+  .backButton {
+    top: 1rem;
+    left: 1rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .nextEpisodeBtn {
+    bottom: 80px;
+    right: 20px;
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+
+  .epOverlay {
+    top: 15px;
+    font-size: 1rem;
+    padding: 5px 15px;
+    text-align: center;
+    width: 90%;
+  }
+}
