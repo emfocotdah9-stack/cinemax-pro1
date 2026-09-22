@@ -1,14 +1,25 @@
 import { NextResponse } from 'next/server';
 
-const XTREAM_URL = 'http://shangaicb.site:80/player_api.php';
-const USERNAME = 'weslleyxc';
-const PASSWORD = 'Cliente10';
-
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
 
+  // Extract credentials from headers
+  const xtreamUrl = request.headers.get('x-xtream-url');
+  const username = request.headers.get('x-xtream-user');
+  const password = request.headers.get('x-xtream-pass');
+
+  if (!xtreamUrl || !username || !password) {
+    return NextResponse.json({ error: 'Missing Xtream credentials in headers' }, { status: 401 });
+  }
+
+  // Ensure URL format is correct
+  let cleanUrl = xtreamUrl;
+  if (!cleanUrl.endsWith('/player_api.php')) {
+    cleanUrl = cleanUrl.endsWith('/') ? `${cleanUrl}player_api.php` : `${cleanUrl}/player_api.php`;
+  }
+
   // Build the target URL
-  let targetUrl = `${XTREAM_URL}?username=${USERNAME}&password=${PASSWORD}`;
+  let targetUrl = `${cleanUrl}?username=${username}&password=${password}`;
   
   searchParams.forEach((value, key) => {
     targetUrl += `&${key}=${value}`;

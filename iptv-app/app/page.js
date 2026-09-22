@@ -2,8 +2,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import HeroBanner from '../components/HeroBanner';
 import Carousel from '../components/Carousel';
+import SettingsModal from '../components/SettingsModal';
 import { getFavorites, saveFavorite, removeFavorite, isFavorite } from '../utils/favorites';
+import { fetchXtream } from '../utils/apiClient';
 import styles from './page.module.css';
+import { useRouter } from 'next/navigation';
 
 import Link from 'next/link';
 
@@ -11,6 +14,16 @@ export default function AppHome() {
   const [activeTab, setActiveTab] = useState('home');
   const [heroItem, setHeroItem] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const router = useRouter();
+
+  // Auth Protection
+  useEffect(() => {
+    const creds = localStorage.getItem('xtream_credentials');
+    if (!creds) {
+      router.push('/login');
+    }
+  }, [router]);
   
   // Home Data
   const [movies, setMovies] = useState([]);
@@ -42,22 +55,19 @@ export default function AppHome() {
     const fetchData = async () => {
       try {
         // Fetch Movies (VOD)
-        const vodRes = await fetch('/api/xtream?action=get_vod_streams');
-        const vodData = await vodRes.json();
-        const topMovies = vodData.slice(0, 20);
+        const vodData = await fetchXtream('get_vod_streams');
+        const topMovies = Array.isArray(vodData) ? vodData.slice(0, 20) : [];
         setMovies(topMovies);
         
         if (topMovies.length > 0) setHeroItem(topMovies[0]);
 
         // Fetch Series
-        const seriesRes = await fetch('/api/xtream?action=get_series');
-        const seriesData = await seriesRes.json();
-        setSeries(seriesData.slice(0, 20));
+        const seriesData = await fetchXtream('get_series');
+        if (Array.isArray(seriesData)) setSeries(seriesData.slice(0, 20));
 
         // Fetch Live
-        const liveRes = await fetch('/api/xtream?action=get_live_streams');
-        const liveData = await liveRes.json();
-        setLive(liveData.slice(0, 20));
+        const liveData = await fetchXtream('get_live_streams');
+        if (Array.isArray(liveData)) setLive(liveData.slice(0, 20));
       } catch (error) {
         console.error("Error fetching Xtream data:", error);
       }
@@ -86,8 +96,7 @@ export default function AppHome() {
       if (activeTab === 'live') action = 'get_live_categories';
       
       try {
-        const res = await fetch(`/api/xtream?action=${action}`);
-        const data = await res.json();
+        const data = await fetchXtream(action);
         if (Array.isArray(data)) {
           setCategories([
             { category_id: 'all', category_name: 'Todos' },
@@ -123,12 +132,9 @@ export default function AppHome() {
       if (activeTab === 'live') action = 'get_live_streams';
       
       try {
-        const url = selectedCategory === 'all' 
-          ? `/api/xtream?action=${action}`
-          : `/api/xtream?action=${action}&category_id=${selectedCategory}`;
-          
-        const res = await fetch(url);
-        const data = await res.json();
+        const additionalParams = selectedCategory === 'all' ? '' : `category_id=${selectedCategory}`;
+        const data = await fetchXtream(action, additionalParams);
+        
         if (Array.isArray(data)) {
           if (selectedCategory === 'all') {
             setCategoryItems(data.slice(0, 1500)); // Limite de segurança para não travar o navegador
@@ -156,8 +162,7 @@ export default function AppHome() {
     if (activeTab === 'live') action = 'get_live_streams';
     
     try {
-      const res = await fetch(`/api/xtream?action=${action}`);
-      const data = await res.json();
+      const data = await fetchXtream(action);
       if (Array.isArray(data)) {
         setAllTabItems(data);
       }
@@ -223,7 +228,7 @@ export default function AppHome() {
             <span className={styles.navText}>{!isSidebarCollapsed && 'TV Ao Vivo'}</span>
           </li>
         </ul>
-        <div className={styles.settings} title="Configurações">
+        <div className={styles.settings} title="Configurações" onClick={() => setIsSettingsOpen(true)}>
           <span className={styles.navIcon}>⚙️</span>
           <span className={styles.navText}>{!isSidebarCollapsed && 'Configurações'}</span>
         </div>
@@ -427,7 +432,11 @@ export default function AppHome() {
             />
           </div>
         )}
+
       </main>
+
+      {/* Settings Modal */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }

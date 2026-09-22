@@ -3,6 +3,7 @@ import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getFavorites, saveFavorite, removeFavorite, isFavorite } from '../../../utils/favorites';
+import { fetchXtream } from '../../../utils/apiClient';
 import styles from './movie.module.css';
 
 export default function MovieDetailsPage({ params }) {
@@ -41,8 +42,7 @@ export default function MovieDetailsPage({ params }) {
   useEffect(() => {
     const fetchMovieInfo = async () => {
       try {
-        const res = await fetch(`/api/xtream?action=get_vod_info&vod_id=${id}`);
-        const data = await res.json();
+        const data = await fetchXtream('get_vod_info', `vod_id=${id}`);
         
         if (data.info) {
           setMovieInfo(data.info);

@@ -3,6 +3,7 @@ import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getFavorites, saveFavorite, removeFavorite, isFavorite } from '../../../utils/favorites';
+import { fetchXtream } from '../../../utils/apiClient';
 import styles from './series.module.css';
 
 export default function SeriesDetailsPage({ params }) {
@@ -43,8 +44,7 @@ export default function SeriesDetailsPage({ params }) {
   useEffect(() => {
     const fetchSeriesInfo = async () => {
       try {
-        const res = await fetch(`/api/xtream?action=get_series_info&series_id=${id}`);
-        const data = await res.json();
+        const data = await fetchXtream('get_series_info', `series_id=${id}`);
         
         if (data.info) {
           setSeriesInfo(data.info);

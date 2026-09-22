@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { fetchXtream, getCredentials } from '../../../../utils/apiClient';
 import styles from './player.module.css';
 
 export default function PlayerPage({ params }) {
@@ -24,8 +25,7 @@ export default function PlayerPage({ params }) {
 
     const fetchSeries = async () => {
       try {
-        const res = await fetch(`/api/xtream?action=get_series_info&series_id=${seriesId}`);
-        const data = await res.json();
+        const data = await fetchXtream('get_series_info', `series_id=${seriesId}`);
         
         if (data.episodes) {
           // Flatten all episodes into a single sorted array
@@ -99,10 +99,23 @@ export default function PlayerPage({ params }) {
     function initializePlayer() {
       let targetUrl = '';
       
-      // Xtream Codes stream URL format
-      const XTREAM_BASE = 'http://shangaicb.site:80';
-      const USER = 'weslleyxc';
-      const PASS = 'Cliente10';
+      const creds = getCredentials();
+      if (!creds) {
+        router.push('/login');
+        return;
+      }
+
+      // Format URL to remove trailing slash or player_api.php
+      let baseUrl = creds.url;
+      if (baseUrl.endsWith('/player_api.php')) {
+        baseUrl = baseUrl.replace('/player_api.php', '');
+      } else if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.slice(0, -1);
+      }
+
+      const XTREAM_BASE = baseUrl;
+      const USER = creds.username;
+      const PASS = creds.password;
 
       if (type === 'live') {
         targetUrl = `${XTREAM_BASE}/live/${USER}/${PASS}/${id}.m3u8`;
