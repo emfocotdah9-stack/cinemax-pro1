@@ -30,11 +30,12 @@ export default function AppHome() {
   const [series, setSeries] = useState([]);
   const [live, setLive] = useState([]);
 
-  // Category Data
+  // Categories Data
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryItems, setCategoryItems] = useState([]);
   const [isLoadingCategory, setIsLoadingCategory] = useState(false);
+  const [visibleCategoryCount, setVisibleCategoryCount] = useState(50);
   
   // Search Data
   const [searchQuery, setSearchQuery] = useState('');
@@ -137,10 +138,11 @@ export default function AppHome() {
         
         if (Array.isArray(data)) {
           if (selectedCategory === 'all') {
-            setCategoryItems(data.slice(0, 1500)); // Limite de segurança para não travar o navegador
+            setCategoryItems(data);
           } else {
             setCategoryItems(data);
           }
+          setVisibleCategoryCount(50); // Reset count on category change
         }
       } catch (error) {
         console.error("Error fetching category items:", error);
@@ -325,10 +327,13 @@ export default function AppHome() {
                       onFocus={() => setHeroItem(item)}
                       tabIndex={0}
                     >
-                      <div 
-                        className={styles.cardImage} 
-                        style={{ backgroundImage: `url(${proxyImageUrl(item.stream_icon || item.cover) || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
-                      >
+                      <div className={styles.cardImage}>
+                        <img 
+                          src={proxyImageUrl(item.stream_icon || item.cover) || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'} 
+                          alt={item.name || item.title}
+                          loading="lazy"
+                          className={styles.lazyImg}
+                        />
                         <button 
                           className={styles.liveFavBtn}
                           onClick={handleFavoriteClick}
@@ -353,62 +358,78 @@ export default function AppHome() {
             {isLoadingCategory ? (
               <h2 style={{color: '#fff', gridColumn: '1 / -1', textAlign: 'center'}}>Carregando...</h2>
             ) : (
-              categoryItems.map((item, idx) => {
-                const id = item.stream_id || item.series_id;
-                const itemType = item.stream_type === 'live' ? 'live' : (item.series_id ? 'series' : 'movie');
-                
-                let href = `/player/${itemType}/${id}`;
-                if (itemType === 'series') href = `/series/${id}`;
-                if (itemType === 'movie') href = `/movie/${id}`;
+              <>
+                {categoryItems.slice(0, visibleCategoryCount).map((item, idx) => {
+                  const id = item.stream_id || item.series_id;
+                  const itemType = item.stream_type === 'live' ? 'live' : (item.series_id ? 'series' : 'movie');
+                  
+                  let href = `/player/${itemType}/${id}`;
+                  if (itemType === 'series') href = `/series/${id}`;
+                  if (itemType === 'movie') href = `/movie/${id}`;
 
-                const isFav = isFavorite(itemType, id);
+                  const isFav = isFavorite(itemType, id);
 
-                const handleFavoriteClick = (e) => {
-                  e.preventDefault();
-                  if (isFav) {
-                    removeFavorite(itemType, id);
-                  } else {
-                    const itemToSave = {
-                      stream_id: item.stream_id || undefined,
-                      series_id: item.series_id || undefined,
-                      name: item.name || item.title,
-                      cover: item.cover,
-                      stream_icon: item.stream_icon,
-                      stream_type: itemType
-                    };
-                    saveFavorite(itemType, itemToSave);
-                  }
-                  // Force re-render
-                  setCategoryItems([...categoryItems]);
-                };
+                  const handleFavoriteClick = (e) => {
+                    e.preventDefault();
+                    if (isFav) {
+                      removeFavorite(itemType, id);
+                    } else {
+                      const itemToSave = {
+                        stream_id: item.stream_id || undefined,
+                        series_id: item.series_id || undefined,
+                        name: item.name || item.title,
+                        cover: item.cover,
+                        stream_icon: item.stream_icon,
+                        stream_type: itemType
+                      };
+                      saveFavorite(itemType, itemToSave);
+                    }
+                    // Force re-render
+                    setCategoryItems([...categoryItems]);
+                  };
 
-                return (
-                  <Link href={href} key={id || idx}>
-                    <div 
-                      className={styles.card}
-                      onMouseEnter={() => setHeroItem(item)}
-                      onFocus={() => setHeroItem(item)}
-                      tabIndex={0}
-                    >
+                  return (
+                    <Link href={href} key={id || idx}>
                       <div 
-                        className={styles.cardImage} 
-                        style={{ backgroundImage: `url(${proxyImageUrl(item.stream_icon || item.cover) || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
+                        className={styles.card}
+                        onMouseEnter={() => setHeroItem(item)}
+                        onFocus={() => setHeroItem(item)}
+                        tabIndex={0}
                       >
-                        <button 
-                          className={styles.liveFavBtn}
-                          onClick={handleFavoriteClick}
-                          title="Favoritar"
-                        >
-                          {isFav ? '⭐' : '☆'}
-                        </button>
+                        <div className={styles.cardImage}>
+                          <img 
+                            src={proxyImageUrl(item.stream_icon || item.cover) || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'} 
+                            alt={item.name}
+                            loading="lazy"
+                            className={styles.lazyImg}
+                          />
+                          <button 
+                            className={styles.liveFavBtn}
+                            onClick={handleFavoriteClick}
+                            title="Favoritar"
+                          >
+                            {isFav ? '⭐' : '☆'}
+                          </button>
+                        </div>
+                        <div className={styles.cardInfo}>
+                          <h3 className={styles.cardTitle}>{item.name}</h3>
+                        </div>
                       </div>
-                      <div className={styles.cardInfo}>
-                        <h3 className={styles.cardTitle}>{item.name}</h3>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })
+                    </Link>
+                  );
+                })}
+                
+                {visibleCategoryCount < categoryItems.length && (
+                  <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+                    <button 
+                      onClick={() => setVisibleCategoryCount(prev => prev + 50)}
+                      className={styles.loadMoreBtn}
+                    >
+                      Carregar mais ({categoryItems.length - visibleCategoryCount} restantes)
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
