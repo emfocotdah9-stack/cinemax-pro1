@@ -3,7 +3,7 @@ import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getFavorites, saveFavorite, removeFavorite, isFavorite } from '../../../utils/favorites';
-import { fetchXtream } from '../../../utils/apiClient';
+import { fetchXtream, proxyImageUrl } from '../../../utils/apiClient';
 import styles from './series.module.css';
 
 export default function SeriesDetailsPage({ params }) {
@@ -86,14 +86,14 @@ export default function SeriesDetailsPage({ params }) {
 
       <div 
         className={styles.backdrop} 
-        style={{ backgroundImage: `url(${seriesInfo.backdrop_path && seriesInfo.backdrop_path.length > 0 ? seriesInfo.backdrop_path[0] : seriesInfo.cover})` }}
+        style={{ backgroundImage: `url(${proxyImageUrl(seriesInfo.backdrop_path && seriesInfo.backdrop_path.length > 0 ? seriesInfo.backdrop_path[0] : seriesInfo.cover)})` }}
       ></div>
 
       <div className={styles.content}>
         <div className={styles.infoSection}>
           <div 
             className={styles.poster}
-            style={{ backgroundImage: `url(${seriesInfo.cover})` }}
+            style={{ backgroundImage: `url(${proxyImageUrl(seriesInfo.cover)})` }}
           ></div>
           
           <div className={styles.details}>
@@ -157,7 +157,7 @@ export default function SeriesDetailsPage({ params }) {
                 <div className={styles.episodeCard} tabIndex={0}>
                   <div 
                     className={styles.episodeImage}
-                    style={{ backgroundImage: `url(${ep.info.movie_image || seriesInfo.cover})` }}
+                    style={{ backgroundImage: `url(${proxyImageUrl(ep.info.movie_image || seriesInfo.cover)})` }}
                   >
                     <div className={styles.playIcon}>▶️</div>
                   </div>

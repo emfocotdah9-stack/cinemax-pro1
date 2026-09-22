@@ -36,3 +36,11 @@ export const fetchXtream = async (action, additionalParams = '') => {
 
   return response.json();
 };
+
+export const proxyImageUrl = (url) => {
+  if (!url) return '';
+  // If already HTTPS or data URL, return as-is
+  if (url.startsWith('https://') || url.startsWith('data:')) return url;
+  // Proxy HTTP images through our API to avoid mixed content blocking
+  return `/api/image-proxy?url=${encodeURIComponent(url)}`;
+};

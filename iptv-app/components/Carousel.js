@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import styles from './Carousel.module.css';
 import { getFavorites, saveFavorite, removeFavorite, isFavorite } from '../utils/favorites';
+import { proxyImageUrl } from '../utils/apiClient';
 
 import Link from 'next/link';
 
@@ -70,7 +71,7 @@ export default function Carousel({ title, items, onFocusItem, type = 'movie' }) 
                 >
                   <div 
                     className={styles.cardImage} 
-                    style={{ backgroundImage: `url(${item.stream_icon || item.cover || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
+                    style={{ backgroundImage: `url(${proxyImageUrl(item.stream_icon || item.cover) || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
                   >
                     <button 
                       className={styles.favBtn}

@@ -27,7 +27,7 @@ export async function GET(request) {
 
   try {
     const response = await fetch(targetUrl, {
-      next: { revalidate: 3600 } // cache for 1 hour to reduce server load
+      cache: 'no-store' // Always fetch fresh data
     });
 
     if (!response.ok) {

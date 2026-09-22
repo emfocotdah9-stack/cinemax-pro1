@@ -3,7 +3,7 @@ import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getFavorites, saveFavorite, removeFavorite, isFavorite } from '../../../utils/favorites';
-import { fetchXtream } from '../../../utils/apiClient';
+import { fetchXtream, proxyImageUrl } from '../../../utils/apiClient';
 import styles from './movie.module.css';
 
 export default function MovieDetailsPage({ params }) {
@@ -74,14 +74,14 @@ export default function MovieDetailsPage({ params }) {
 
       <div 
         className={styles.backdrop} 
-        style={{ backgroundImage: `url(${movieInfo.backdrop_path && movieInfo.backdrop_path.length > 0 ? movieInfo.backdrop_path[0] : movieInfo.cover_big || movieInfo.cover || movieInfo.movie_image})` }}
+        style={{ backgroundImage: `url(${proxyImageUrl(movieInfo.backdrop_path && movieInfo.backdrop_path.length > 0 ? movieInfo.backdrop_path[0] : movieInfo.cover_big || movieInfo.cover || movieInfo.movie_image)})` }}
       ></div>
 
       <div className={styles.content}>
         <div className={styles.infoSection}>
           <div 
             className={styles.poster}
-            style={{ backgroundImage: `url(${movieInfo.cover_big || movieInfo.cover || movieInfo.movie_image})` }}
+            style={{ backgroundImage: `url(${proxyImageUrl(movieInfo.cover_big || movieInfo.cover || movieInfo.movie_image)})` }}
           ></div>
           
           <div className={styles.details}>

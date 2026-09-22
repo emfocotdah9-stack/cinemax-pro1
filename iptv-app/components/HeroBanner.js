@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { proxyImageUrl } from '../utils/apiClient';
 import styles from './HeroBanner.module.css';
 
 export default function HeroBanner({ item }) {
@@ -9,7 +10,7 @@ export default function HeroBanner({ item }) {
     <div className={styles.heroContainer}>
       <div 
         className={styles.heroBackground} 
-        style={{ backgroundImage: `url(${item.stream_icon || item.cover || 'https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&q=80'})` }}
+        style={{ backgroundImage: `url(${proxyImageUrl(item.stream_icon || item.cover) || 'https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&q=80'})` }}
       >
         <div className={styles.heroGradient}></div>
       </div>

@@ -4,7 +4,7 @@ import HeroBanner from '../components/HeroBanner';
 import Carousel from '../components/Carousel';
 import SettingsModal from '../components/SettingsModal';
 import { getFavorites, saveFavorite, removeFavorite, isFavorite } from '../utils/favorites';
-import { fetchXtream } from '../utils/apiClient';
+import { fetchXtream, proxyImageUrl } from '../utils/apiClient';
 import styles from './page.module.css';
 import { useRouter } from 'next/navigation';
 
@@ -327,7 +327,7 @@ export default function AppHome() {
                     >
                       <div 
                         className={styles.cardImage} 
-                        style={{ backgroundImage: `url(${item.stream_icon || item.cover || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
+                        style={{ backgroundImage: `url(${proxyImageUrl(item.stream_icon || item.cover) || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
                       >
                         <button 
                           className={styles.liveFavBtn}
@@ -392,7 +392,7 @@ export default function AppHome() {
                     >
                       <div 
                         className={styles.cardImage} 
-                        style={{ backgroundImage: `url(${item.stream_icon || item.cover || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
+                        style={{ backgroundImage: `url(${proxyImageUrl(item.stream_icon || item.cover) || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
                       >
                         <button 
                           className={styles.liveFavBtn}

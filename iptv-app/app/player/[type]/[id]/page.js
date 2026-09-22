@@ -117,13 +117,8 @@ export default function PlayerPage({ params }) {
       const USER = creds.username;
       const PASS = creds.password;
 
-      if (type === 'live') {
-        targetUrl = `${XTREAM_BASE}/live/${USER}/${PASS}/${id}.m3u8`;
-      } else if (type === 'movie') {
-        targetUrl = `${XTREAM_BASE}/movie/${USER}/${PASS}/${id}.mp4`;
-      } else if (type === 'series') {
-        targetUrl = `${XTREAM_BASE}/series/${USER}/${PASS}/${id}.mp4`;
-      }
+      const ext = type === 'live' ? 'm3u8' : 'mp4';
+      targetUrl = `/api/stream?server=${encodeURIComponent(creds.url)}&user=${encodeURIComponent(USER)}&pass=${encodeURIComponent(PASS)}&type=${type}&id=${id}&ext=${ext}`;
 
       const video = videoRef.current;
       if (!video) return;
