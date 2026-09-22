@@ -1,9 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from './Carousel.module.css';
+import { getFavorites, saveFavorite, removeFavorite, isFavorite } from '../utils/favorites';
 
 import Link from 'next/link';
 
 export default function Carousel({ title, items, onFocusItem, type = 'movie' }) {
+  const [dummy, setDummy] = useState(0);
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
@@ -38,6 +40,27 @@ export default function Carousel({ title, items, onFocusItem, type = 'movie' }) 
             if (itemType === 'series') href = `/series/${id}`;
             if (itemType === 'movie') href = `/movie/${id}`;
 
+            const isFav = isFavorite(itemType, id);
+
+            const handleFavoriteClick = (e) => {
+              e.preventDefault();
+              if (isFav) {
+                removeFavorite(itemType, id);
+              } else {
+                const itemToSave = {
+                  stream_id: item.stream_id || undefined,
+                  series_id: item.series_id || undefined,
+                  name: item.name || item.title,
+                  cover: item.cover,
+                  stream_icon: item.stream_icon,
+                  stream_type: itemType
+                };
+                saveFavorite(itemType, itemToSave);
+              }
+              // Force re-render
+              setDummy(dummy + 1);
+            };
+
             return (
               <Link href={href} key={id || idx}>
                 <div 
@@ -48,7 +71,15 @@ export default function Carousel({ title, items, onFocusItem, type = 'movie' }) 
                   <div 
                     className={styles.cardImage} 
                     style={{ backgroundImage: `url(${item.stream_icon || item.cover || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
-                  ></div>
+                  >
+                    <button 
+                      className={styles.favBtn}
+                      onClick={handleFavoriteClick}
+                      title="Favoritar"
+                    >
+                      {isFav ? '⭐' : '☆'}
+                    </button>
+                  </div>
                   <div className={styles.cardInfo}>
                     <h3 className={styles.cardTitle}>{item.name}</h3>
                   </div>

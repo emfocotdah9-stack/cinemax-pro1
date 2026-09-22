@@ -273,6 +273,28 @@ export default function AppHome() {
                 if (itemType === 'series') href = `/series/${id}`;
                 if (itemType === 'movie') href = `/movie/${id}`;
 
+                const isFav = isFavorite(itemType, id);
+
+                const handleFavoriteClick = (e) => {
+                  e.preventDefault();
+                  if (isFav) {
+                    removeFavorite(itemType, id);
+                  } else {
+                    const itemToSave = {
+                      stream_id: item.stream_id || undefined,
+                      series_id: item.series_id || undefined,
+                      name: item.name || item.title,
+                      cover: item.cover,
+                      stream_icon: item.stream_icon,
+                      stream_type: itemType
+                    };
+                    saveFavorite(itemType, itemToSave);
+                  }
+                  // Force re-render search results by updating a generic state or just setCategoryItems for now?
+                  // Wait, modifying search results array needs to trigger re-render
+                  setAllTabItems([...allTabItems]);
+                };
+
                 return (
                   <Link href={href} key={`search-${id}-${idx}`}>
                     <div 
@@ -284,7 +306,15 @@ export default function AppHome() {
                       <div 
                         className={styles.cardImage} 
                         style={{ backgroundImage: `url(${item.stream_icon || item.cover || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
-                      ></div>
+                      >
+                        <button 
+                          className={styles.liveFavBtn}
+                          onClick={handleFavoriteClick}
+                          title="Favoritar"
+                        >
+                          {isFav ? '⭐' : '☆'}
+                        </button>
+                      </div>
                       <div className={styles.cardInfo}>
                         <h3 className={styles.cardTitle}>{item.name || item.title}</h3>
                       </div>
@@ -309,17 +339,24 @@ export default function AppHome() {
                 if (itemType === 'series') href = `/series/${id}`;
                 if (itemType === 'movie') href = `/movie/${id}`;
 
-                const isLive = itemType === 'live';
-                const isFav = isLive ? isFavorite('live', id) : false;
+                const isFav = isFavorite(itemType, id);
 
-                const handleLiveFavorite = (e) => {
+                const handleFavoriteClick = (e) => {
                   e.preventDefault();
                   if (isFav) {
-                    removeFavorite('live', id);
+                    removeFavorite(itemType, id);
                   } else {
-                    saveFavorite('live', item);
+                    const itemToSave = {
+                      stream_id: item.stream_id || undefined,
+                      series_id: item.series_id || undefined,
+                      name: item.name || item.title,
+                      cover: item.cover,
+                      stream_icon: item.stream_icon,
+                      stream_type: itemType
+                    };
+                    saveFavorite(itemType, itemToSave);
                   }
-                  // Force re-render to update icon
+                  // Force re-render
                   setCategoryItems([...categoryItems]);
                 };
 
@@ -335,14 +372,13 @@ export default function AppHome() {
                         className={styles.cardImage} 
                         style={{ backgroundImage: `url(${item.stream_icon || item.cover || 'https://via.placeholder.com/300x450/1a1f2e/ffffff?text=No+Image'})` }}
                       >
-                        {isLive && (
-                          <button 
-                            className={styles.liveFavBtn}
-                            onClick={handleLiveFavorite}
-                          >
-                            {isFav ? '⭐' : '☆'}
-                          </button>
-                        )}
+                        <button 
+                          className={styles.liveFavBtn}
+                          onClick={handleFavoriteClick}
+                          title="Favoritar"
+                        >
+                          {isFav ? '⭐' : '☆'}
+                        </button>
                       </div>
                       <div className={styles.cardInfo}>
                         <h3 className={styles.cardTitle}>{item.name}</h3>
