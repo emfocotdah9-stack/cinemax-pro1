@@ -1,4 +1,4 @@
-import { getCredentials } from '../../../../utils/apiClient';
+import { getCredentials } from '../../../utils/apiClient';
 
 export async function GET(request, { params }) {
   const { searchParams } = new URL(request.url);
