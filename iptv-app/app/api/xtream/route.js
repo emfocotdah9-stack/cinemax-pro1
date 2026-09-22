@@ -12,8 +12,11 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Missing Xtream credentials in headers' }, { status: 401 });
   }
 
-  // Ensure URL format is correct
   let cleanUrl = xtreamUrl;
+  if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+    cleanUrl = `http://${cleanUrl}`;
+  }
+  
   if (!cleanUrl.endsWith('/player_api.php')) {
     cleanUrl = cleanUrl.endsWith('/') ? `${cleanUrl}player_api.php` : `${cleanUrl}/player_api.php`;
   }

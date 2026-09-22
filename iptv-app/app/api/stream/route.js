@@ -17,6 +17,10 @@ export async function GET(request, { params }) {
 
   // Build base URL
   let baseUrl = xtreamUrl;
+  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+    baseUrl = `http://${baseUrl}`;
+  }
+
   if (baseUrl.endsWith('/player_api.php')) {
     baseUrl = baseUrl.replace('/player_api.php', '');
   } else if (baseUrl.endsWith('/')) {
