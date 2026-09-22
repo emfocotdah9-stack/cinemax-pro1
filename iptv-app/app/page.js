@@ -253,11 +253,11 @@ export default function AppHome() {
           </div>
         )}
 
-        {!isSearching && <HeroBanner item={heroItem} />}
+        {activeTab === 'home' && !isSearching && <HeroBanner item={heroItem} />}
         
         
         {!isSearching && activeTab !== 'home' && categories.length > 0 && (
-          <div className={styles.categoriesWrapper}>
+          <div className={styles.categoriesWrapper} style={{ marginTop: '80px' }}>
             <button 
               className={`${styles.categoryScrollBtn} ${styles.scrollLeft}`}
               onClick={() => scrollCategories('left')}
@@ -285,7 +285,7 @@ export default function AppHome() {
         )}
 
         {isSearching && (
-          <div className={styles.gridContainer} style={{ marginTop: '2rem' }}>
+          <div className={styles.gridContainer} style={{ marginTop: activeTab === 'home' ? '2rem' : '100px' }}>
             {searchResults.length === 0 && searchQuery.length > 2 ? (
               <h2 style={{color: '#fff', gridColumn: '1 / -1', textAlign: 'center'}}>Nenhum resultado encontrado para "{searchQuery}"</h2>
             ) : (
@@ -354,7 +354,7 @@ export default function AppHome() {
         )}
 
         {!isSearching && activeTab !== 'home' && selectedCategory && (
-          <div className={styles.gridContainer}>
+          <div className={styles.gridContainer} style={{ marginTop: '1rem' }}>
             {isLoadingCategory ? (
               <h2 style={{color: '#fff', gridColumn: '1 / -1', textAlign: 'center'}}>Carregando...</h2>
             ) : (
