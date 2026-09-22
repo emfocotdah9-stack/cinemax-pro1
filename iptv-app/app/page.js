@@ -10,6 +10,7 @@ import Link from 'next/link';
 export default function AppHome() {
   const [activeTab, setActiveTab] = useState('home');
   const [heroItem, setHeroItem] = useState(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   // Home Data
   const [movies, setMovies] = useState([]);
@@ -27,9 +28,6 @@ export default function AppHome() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [allTabItems, setAllTabItems] = useState([]);
-
-  // Sidebar State
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   const categoryScrollRef = useRef(null);
 
@@ -172,40 +170,50 @@ export default function AppHome() {
   }, [searchQuery, allTabItems]);
 
   return (
-    <div className={`${styles.appContainer} ${isSidebarCollapsed ? styles.collapsedApp : ''}`}>
+    <div className={`${styles.appContainer} ${isSidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
       {/* Sidebar Navigation */}
-      <nav className={`${styles.sidebar} ${isSidebarCollapsed ? styles.collapsed : ''}`}>
-        <div className={styles.logoContainer}>
-          <div className={styles.logo}>{isSidebarCollapsed ? 'IPTV' : 'IPTV Pro'}</div>
+      <nav className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          {!isSidebarCollapsed && <div className={styles.logo}>IPTV Pro</div>}
           <button 
-            className={styles.collapseBtn} 
+            className={styles.collapseToggle} 
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            title={isSidebarCollapsed ? "Expandir" : "Recolher"}
+            title={isSidebarCollapsed ? "Expandir menu" : "Recolher menu"}
           >
-            {isSidebarCollapsed ? '❯' : '❮'}
+            {isSidebarCollapsed ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            )}
           </button>
         </div>
         <ul className={styles.navItems}>
-          <li className={activeTab === 'home' ? styles.active : ''} onClick={() => setActiveTab('home')} tabIndex={0}>
-            <span>🏠 {isSidebarCollapsed ? '' : 'Início'}</span>
+          <li className={activeTab === 'home' ? styles.active : ''} onClick={() => setActiveTab('home')} tabIndex={0} title="Início">
+            <span>🏠 {!isSidebarCollapsed && 'Início'}</span>
           </li>
-          <li className={activeTab === 'movies' ? styles.active : ''} onClick={() => setActiveTab('movies')} tabIndex={0}>
-            <span>🎬 {isSidebarCollapsed ? '' : 'Filmes'}</span>
+          <li className={activeTab === 'movies' ? styles.active : ''} onClick={() => setActiveTab('movies')} tabIndex={0} title="Filmes">
+            <span>🎬 {!isSidebarCollapsed && 'Filmes'}</span>
           </li>
-          <li className={activeTab === 'series' ? styles.active : ''} onClick={() => setActiveTab('series')} tabIndex={0}>
-            <span>📺 {isSidebarCollapsed ? '' : 'Séries'}</span>
+          <li className={activeTab === 'series' ? styles.active : ''} onClick={() => setActiveTab('series')} tabIndex={0} title="Séries">
+            <span>📺 {!isSidebarCollapsed && 'Séries'}</span>
           </li>
-          <li className={activeTab === 'live' ? styles.active : ''} onClick={() => setActiveTab('live')} tabIndex={0}>
-            <span>📡 {isSidebarCollapsed ? '' : 'TV Ao Vivo'}</span>
+          <li className={activeTab === 'live' ? styles.active : ''} onClick={() => setActiveTab('live')} tabIndex={0} title="TV Ao Vivo">
+            <span>📡 {!isSidebarCollapsed && 'TV Ao Vivo'}</span>
           </li>
         </ul>
-        <div className={styles.settings}>
-          <span>⚙️ {isSidebarCollapsed ? '' : 'Configurações'}</span>
+        <div className={styles.settings} title="Configurações">
+          <span>⚙️ {!isSidebarCollapsed && 'Configurações'}</span>
         </div>
       </nav>
 
       {/* Main Content Area */}
-      <main className={`${styles.mainContent} ${isSidebarCollapsed ? styles.collapsedMain : ''}`}>
+      <main className={styles.mainContent}>
         
         {activeTab !== 'home' && (
           <div className={styles.searchContainer}>
